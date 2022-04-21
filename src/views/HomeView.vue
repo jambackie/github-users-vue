@@ -1,18 +1,24 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <h1>home</h1>
+  <user-item
+    v-for="user in users"
+    :key="user.id"
+    :userItem="user"
+    @click="$router.push(`/${user.name}`)"
+  ></user-item>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import UserItem from '@/components/UserItem.vue';
+import { mapState } from 'vuex';
 
 export default {
   name: 'HomeView',
   components: {
-    HelloWorld
-  }
-}
+    UserItem,
+  },
+  computed: {
+    ...mapState(['users']),
+  },
+};
 </script>
