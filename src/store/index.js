@@ -7,6 +7,7 @@ export default createStore({
       total_count: 0
     },
     userPage: {},
+    input: '',
   },
   getters: {
     USERS_LIST: (state) => state.users.items,
@@ -21,17 +22,52 @@ export default createStore({
         items: [],
         total_count: 0
       }
+    },
+    SET_USERPAGE(state, obj) {
+      state.userPage = obj
+    },
+    SET_REPOS(state, arr) {
+      state.userPage.repos = arr
+    },
+    SET_EVENT(state, arr) {
+      state.userPage.lastEvent = arr.length > 0 ? arr[0].created_at : null
+    },
+    UPDATE_INPUT(state, str) {
+      state.input = str
     }
   },
   actions: {
     async GET_USERS({ commit }, login) {
       try {
-        await fetch(`https://api.github.com/search/users?q=${login}&sort=repos&per_page=10&?access_token=${process.env.VUE_APP_TOKEN}`)
-          .then(res => res.json()).then(data => commit('SET_USERS', data))
+        let data = await fetch(`https://api.github.com/search/users?q=${login}&sort=repositories&per_page=10`, {
+          Accept: {
+            "access_token":process.env.VUE_APP_TOKEN,
+            "scope":"repo,gist",
+            "token_type":"bearer"
+          }
+        })
+        data = await data.json()
+        commit('SET_USERS', data)
       } catch(err) {        
         console.log(err)
       }
     },
-  },
-  modules: {},
+    async LOAD_DATA({ commit }, login) {
+      const accept = {Accept: {
+        "access_token":process.env.VUE_APP_TOKEN,
+        "scope":"repo,gist",
+        "token_type":"bearer"
+      }}
+      try {
+        let reposList = await fetch(`https://api.github.com/users/${login}/repos?per_page=100`, accept)
+        reposList = await reposList.json()
+        commit('SET_REPOS', reposList)
+        let eventsList = await fetch(`https://api.github.com/users/${login}/events`, accept)
+        eventsList = await eventsList.json()
+        commit('SET_EVENT', eventsList)
+      } catch(err) {
+        console.log(err)
+      }
+    }
+  }
 });
