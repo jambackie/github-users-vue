@@ -8,6 +8,7 @@ export default createStore({
     },
     userPage: {},
     input: '',
+    scroll: 0,
   },
   getters: {
     USERS_LIST: (state) => state.users.items,
@@ -34,12 +35,15 @@ export default createStore({
     },
     UPDATE_INPUT(state, str) {
       state.input = str
+    },
+    SAVE_SCROLL(state, num) {
+      state.scroll = num
     }
   },
   actions: {
     async GET_USERS({ commit }, login) {
       try {
-        let data = await fetch(`https://api.github.com/search/users?q=${login}&sort=repositories&per_page=10`, {
+        let data = await fetch(`https://api.github.com/search/users?q=${login}&sort=repositories&per_page=12`, {
           Accept: {
             "access_token":process.env.VUE_APP_TOKEN,
             "scope":"repo,gist",

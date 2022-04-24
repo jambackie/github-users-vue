@@ -1,17 +1,21 @@
 <template>
-  <div>
-    <div>
-    <input type="text" v-model="input" >
-    <span>{{ total }}</span>
-  </div>
-  <div
-    v-for="user in users"
-    :key="user.id"
-    @click="clickUser(user)"
-  >
-    <h2>{{ user.login }}</h2>
-    <img :src="user.avatar_url" width="120" alt="pic">
-  </div>
+  <div class="container">
+    <h1 class="heading">Github users search</h1>
+    <label class="input">
+      <input type="text" v-model="input" placeholder="Login">
+      Total users: <b>{{ total }}</b>
+    </label>
+    <div class="items">
+      <div
+        v-for="user in users"
+        :key="user.id"
+        class="item"
+        @click="clickUser(user)"
+      > 
+        <img class="item__img" :src="user.avatar_url" alt="pic">
+        <h2 class="item__name">{{ user.login }}</h2>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -27,6 +31,7 @@ export default {
   },
   mounted() {
     this.inputValue = this.$store.state.input
+    window.scrollTo(0, this.$store.state.scroll)
   },
   computed: {
     ...mapGetters(['USERS_COUNT', 'USERS_LIST']),
@@ -54,7 +59,8 @@ export default {
     ...mapMutations([
       'RESET_USERS',
       'SET_USERPAGE',
-      'UPDATE_INPUT'
+      'UPDATE_INPUT',
+      'SAVE_SCROLL'
     ]),
     getUsers() {
       this.inputValue.length > 0 ? this.GET_USERS(this.inputValue) : this.RESET_USERS()
@@ -63,6 +69,7 @@ export default {
       this.$router.push(`/${user.login}`)
       this.SET_USERPAGE(user)
       this.UPDATE_INPUT(this.inputValue)
+      this.SAVE_SCROLL(window.scrollY)
     }
   }
 };
