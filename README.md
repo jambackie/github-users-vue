@@ -1,5 +1,8 @@
 # github-users-vue
 
+## Deploy
+https://jambackie.github.io/github-users-vue/
+
 ## Project setup
 ```
 npm install
