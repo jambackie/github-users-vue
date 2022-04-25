@@ -72,6 +72,7 @@ a {
 
 .user {
   display: flex;
+  flex-wrap: wrap;
 
   &__btn {
     position: relative;
@@ -110,7 +111,8 @@ a {
 
   &__img {
     width: 20%;
-    margin: 0 20px;
+    min-width: 150px;
+    margin: 20px;
     border-radius: 50%;
   }
 
@@ -120,6 +122,7 @@ a {
 
   &__active {
     margin-right: 24px;
+    white-space: nowrap;
   }
 
   &__github {
