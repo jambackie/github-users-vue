@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapMutations } from 'vuex';
+import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
 
 export default {
   name: 'HomeView',
@@ -31,10 +31,19 @@ export default {
   },
   mounted() {
     this.inputValue = this.$store.state.input
-    window.scrollTo(0, this.$store.state.scroll)
+    window.scrollTo(0, this.scroll)
+    window.addEventListener('scroll', this.onScroll)
+  },
+  beforeRouteLeave() {
+    this.SAVE_SCROLL(window.scrollY)
+    this.UPDATE_INPUT(this.inputValue)
+  },
+  unmounted() {
+    window.removeEventListener('scroll', this.onScroll)
   },
   computed: {
     ...mapGetters(['USERS_COUNT', 'USERS_LIST']),
+    ...mapState(['input', 'scroll', 'usersBottom']),
     users() {
       return this.USERS_LIST
     },
@@ -54,13 +63,17 @@ export default {
       }
     }
   },
+  watch: {
+    usersBottom: 'addUsers',
+  },
   methods: {
-    ...mapActions(['GET_USERS']),
+    ...mapActions(['GET_USERS', 'ADD_USERS']),
     ...mapMutations([
       'RESET_USERS',
       'SET_USERPAGE',
       'UPDATE_INPUT',
-      'SAVE_SCROLL'
+      'SAVE_SCROLL',
+      'GET_BOTTOM'
     ]),
     getUsers() {
       this.inputValue.length > 0 ? this.GET_USERS(this.inputValue) : this.RESET_USERS()
@@ -68,8 +81,15 @@ export default {
     clickUser(user) {
       this.$router.push(`/${user.login}`)
       this.SET_USERPAGE(user)
-      this.UPDATE_INPUT(this.inputValue)
-      this.SAVE_SCROLL(window.scrollY)
+    },
+    onScroll() {
+      let bottom = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+      if(bottom) this.GET_BOTTOM('usersBottom')
+    },
+    addUsers() {
+      if(this.usersBottom && this.users.length < this.total) {
+        this.ADD_USERS(this.inputValue)
+      }
     }
   }
 };
